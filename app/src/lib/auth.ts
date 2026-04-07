@@ -27,6 +27,7 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   session: { strategy: "database" },
+  pages: { signIn: "/signin", error: "/signin" },
   callbacks: {
     async session({ session, user }) {
       if (session.user) (session.user as { id?: string }).id = user.id;

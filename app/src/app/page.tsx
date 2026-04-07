@@ -5,26 +5,12 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { GoogleWidgets } from "@/components/GoogleWidgets";
 import { NewBoardForm } from "@/components/NewBoardForm";
+import { UserMenu } from "@/components/UserMenu";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
 
-  if (!session?.user) {
-    return (
-      <div className="container">
-        <div className="header">
-          <h1>SmartBoard</h1>
-        </div>
-        <div className="widget">
-          <h2>Sign in</h2>
-          <p className="muted">Connect your Google account to use the dashboard, Gmail and Calendar widgets.</p>
-          <form action="/api/auth/signin/google" method="POST">
-            <button className="btn" type="submit">Sign in with Google</button>
-          </form>
-        </div>
-      </div>
-    );
-  }
+  if (!session?.user) redirect("/signin");
 
   const userId = (session.user as { id: string }).id;
   const boards = await prisma.board.findMany({
@@ -48,12 +34,7 @@ export default async function Home() {
     <div className="container">
       <div className="header">
         <h1>SmartBoard</h1>
-        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-          <span className="muted">{session.user.email}</span>
-          <form action="/api/auth/signout" method="POST">
-            <button className="btn secondary" type="submit">Sign out</button>
-          </form>
-        </div>
+        <UserMenu email={session.user.email ?? ""} image={session.user.image} />
       </div>
 
       <div className="side">
